@@ -2,6 +2,7 @@ from flask import Flask, render_template
 
 from backend.config import BaseConfig
 from backend.utils.app_setup import register_app_blueprints
+from backend.utils.login import login_manager
 
 
 def create_app(config=BaseConfig):
@@ -10,6 +11,7 @@ def create_app(config=BaseConfig):
     app.config.from_object(config)
 
     db.init_app(app)
+    login_manager.init_app(app)
 
     register_app_blueprints(app)
     return app
