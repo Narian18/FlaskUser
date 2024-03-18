@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
 from backend.models.types import ModelID
-from backend.utils.db import db
+from backend.common.db import db
 
 
 class IDMixin:
