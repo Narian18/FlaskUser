@@ -32,7 +32,7 @@ def test_login_logout(app, client):
         create_test_user()
 
     response = client.post('/login', json={'username': USERNAME, 'password': PASSWORD})
-    assert response.status_code == HTTPStatus.OK
+    assert response.status_code == HTTPStatus.OK, response.json
 
     response = client.get('/logout')
     assert response.status_code == HTTPStatus.NO_CONTENT
@@ -48,20 +48,24 @@ def test_login_logout_errors(app, client):
     with app.app_context():
         create_test_user()
 
+    err_uname_missing = "'username': ['Missing data for required field.']"
+    err_pword_missing = "'password': ['Missing data for required field.']"
     response = client.post("/login", json={})
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert response.json == {"error": "Form Incomplete"}, response.json
+    assert response.json == {"error": f'{{{err_uname_missing}, {err_pword_missing}}}'}, response.json
 
     response = client.post("/login", json={"username": USERNAME})
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert response.json == {"error": "Form Incomplete"}, response.json
+    assert response.json == {"error": f'{{{err_pword_missing}}}'}, response.json
 
     response = client.post("/login", json={"password": PASSWORD})
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert response.json == {"error": "Form Incomplete"}, response.json
+    assert response.json == {"error": f'{{{err_uname_missing}}}'}, response.json
 
     response = client.post("/login", json={"username": "WrongName", "password": PASSWORD})
+    assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json == {"error": f'No user found for name or email "WrongName"'}, response.json
 
     response = client.post("/login", json={"username": USERNAME, "password": "WrongPassword"})
+    assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json == {"error": f'Incorrect password for user "{USERNAME}"'}, response.json

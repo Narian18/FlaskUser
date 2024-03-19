@@ -8,14 +8,7 @@ from backend.common.errors import wrap_error
 from backend.models.user import User
 
 
-def login() -> Tuple[Dict[str, str], int]:
-    request_json = request.get_json(silent=True)
-    if not request_json or not request_json.get("username") or not request_json.get("password"):
-        return wrap_error('Form Incomplete', HTTPStatus.BAD_REQUEST)
-
-    name_or_email = request_json.get("username")
-    password = request_json.get("password")
-
+def login(name_or_email: str, password: str) -> Tuple[Dict[str, str], int]:
     user = User.get_by_name(name_or_email)
     if not user:
         user = User.get_by_email(name_or_email)
